@@ -1,0 +1,7 @@
+status,status_label,is_active,is_terminal,sla_days,sort_order
+pending,Pending,true,false,1,1
+processing,Processing,true,false,3,2
+shipped,Shipped,true,false,7,3
+completed,Completed,true,true,0,4
+cancelled,Cancelled,false,true,0,5
+refunded,Refunded,false,true,0,6

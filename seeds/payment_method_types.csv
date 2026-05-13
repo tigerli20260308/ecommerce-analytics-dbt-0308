@@ -1,0 +1,8 @@
+payment_method,payment_category,is_digital,processing_fee_pct
+credit_card,Card,true,0.029
+debit_card,Card,true,0.015
+paypal,Digital Wallet,true,0.034
+bank_transfer,Bank,false,0.008
+apple_pay,Digital Wallet,true,0.025
+google_pay,Digital Wallet,true,0.025
+cash,Cash,false,0.000

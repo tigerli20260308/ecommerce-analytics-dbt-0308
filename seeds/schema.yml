@@ -1,0 +1,49 @@
+version: 2
+
+seeds:
+  - name: country_codes
+    description: "Maps country codes to full country names, regions and currencies"
+    columns:
+      - name: country_code
+        description: "ISO 2-letter country code"
+        tests:
+          - unique
+          - not_null
+      - name: country_name
+        description: "Full country name"
+        tests:
+          - not_null
+      - name: region
+        description: "Geographic region"
+        tests:
+          - not_null
+      - name: currency_code
+        description: "ISO 3-letter currency code"
+        tests:
+          - not_null
+
+  - name: payment_method_types
+    description: "Payment method metadata including fees and categories"
+    columns:
+      - name: payment_method
+        description: "Payment method identifier"
+        tests:
+          - unique
+          - not_null
+      - name: is_digital
+        description: "Whether payment method is digital"
+        tests:
+          - not_null
+
+  - name: order_status_config
+    description: "Order status definitions with SLA and workflow config"
+    columns:
+      - name: status
+        description: "Status identifier matching orders table"
+        tests:
+          - unique
+          - not_null
+      - name: is_terminal
+        description: "Whether this status is a final state"
+        tests:
+          - not_null

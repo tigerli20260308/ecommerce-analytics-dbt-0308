@@ -1,0 +1,44 @@
+version: 2
+
+sources:
+  - name: raw
+    description: "Raw source data loaded from Azure ADLS Gen2"
+    database: ecommerce_dev
+    schema: raw
+    tables:
+      - name: raw_customers
+        description: "Raw customer data"
+        columns:
+          - name: customer_id
+            tests:
+              - not_null
+      - name: raw_orders
+        description: "Raw orders"
+        columns:
+          - name: order_id
+            tests:
+              - not_null
+      - name: raw_products
+        description: "Raw products"
+        columns:
+          - name: product_id
+            tests:
+              - not_null
+      - name: raw_order_items
+        description: "Raw order items"
+        columns:
+          - name: order_item_id
+            tests:
+              - not_null
+      - name: raw_payments
+        description: "Raw payments"
+        columns:
+          - name: payment_id
+            tests:
+              - not_null
+      - name: raw_events
+        description: "Raw events"
+        columns:
+          - name: event_id
+            tests:
+              - not_null

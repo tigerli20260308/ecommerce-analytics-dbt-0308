@@ -2,23 +2,23 @@ version: 2
 
 seeds:
   - name: country_codes
-    description: "Maps country codes to full country names, regions and currencies"
+    description: "Maps country codes to full names, regions and currencies"
     columns:
       - name: country_code
-        description: "ISO 2-letter country code"
+        description: "ISO 2-letter country code e.g. US, CA, UK"
         tests:
           - unique
           - not_null
       - name: country_name
-        description: "Full country name"
+        description: "Full country name e.g. United States"
         tests:
           - not_null
       - name: region
-        description: "Geographic region"
+        description: "Geographic region e.g. North America"
         tests:
           - not_null
       - name: currency_code
-        description: "ISO 3-letter currency code"
+        description: "ISO 3-letter currency code e.g. USD, CAD"
         tests:
           - not_null
 
@@ -26,12 +26,20 @@ seeds:
     description: "Payment method metadata including fees and categories"
     columns:
       - name: payment_method
-        description: "Payment method identifier"
+        description: "Payment method key e.g. credit_card, paypal"
         tests:
           - unique
           - not_null
+      - name: payment_category
+        description: "Category e.g. Card, Digital Wallet, Bank"
+        tests:
+          - not_null
       - name: is_digital
-        description: "Whether payment method is digital"
+        description: "Whether payment method is digital true/false"
+        tests:
+          - not_null
+      - name: processing_fee_pct
+        description: "Fee percentage e.g. 0.029 means 2.9%"
         tests:
           - not_null
 
@@ -39,11 +47,27 @@ seeds:
     description: "Order status definitions with SLA and workflow config"
     columns:
       - name: status
-        description: "Status identifier matching orders table"
+        description: "Status key matching orders table e.g. pending"
         tests:
           - unique
           - not_null
+      - name: status_label
+        description: "Human readable label e.g. Pending"
+        tests:
+          - not_null
+      - name: is_active
+        description: "Whether status is currently active"
+        tests:
+          - not_null
       - name: is_terminal
-        description: "Whether this status is a final state"
+        description: "Whether this is a final state (no more changes)"
+        tests:
+          - not_null
+      - name: sla_days
+        description: "Target days to complete this status"
+        tests:
+          - not_null
+      - name: sort_order
+        description: "Display order in UI"
         tests:
           - not_null

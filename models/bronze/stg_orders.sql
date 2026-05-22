@@ -22,7 +22,8 @@ renamed AS (
         CASE
             WHEN discount_code IS NOT NULL
             AND  discount_code != ''
-            THEN TRUE ELSE FALSE
+            THEN TRUE
+            ELSE FALSE
         END                                     AS has_discount
     FROM source
 )

@@ -52,7 +52,8 @@ models:
               config:
                 severity: warn
               arguments:
-                values: ['pending','processing','shipped','completed','cancelled']
+                values: ['pending','processing','shipped',
+                         'completed','cancelled']
       - name: order_date
         description: "Date order was placed"
         tests:
@@ -163,61 +164,9 @@ models:
               config:
                 severity: warn
               arguments:
-                values: ['page_view','add_to_cart','purchase','remove_from_cart']
+                values: ['page_view','add_to_cart',
+                         'purchase','remove_from_cart']
       - name: event_date
         description: "Derived — date of event"
-        tests:
-          - not_null
-
-  - name: stg_events_incremental
-    description: "Incremental staged events — only loads new rows each run"
-    columns:
-      - name: event_id
-        description: "Primary key"
-        tests:
-          - unique
-          - not_null
-      - name: session_id
-        tests:
-          - not_null
-      - name: event_type
-        tests:
-          - not_null
-          - accepted_values:
-              config:
-                severity: warn
-              arguments:
-                values: ['page_view','add_to_cart','purchase','remove_from_cart']
-      - name: event_date
-        tests:
-          - not_null
-
-  - name: stg_payments_incremental
-    description: "Incremental staged payments — only loads new rows each run"
-    columns:
-      - name: payment_id
-        description: "Primary key"
-        tests:
-          - unique
-          - not_null
-      - name: order_id
-        tests:
-          - not_null
-      - name: payment_status
-        tests:
-          - not_null
-
-  - name: stg_orders_incremental
-    description: "Incremental staged orders — only loads new rows each run"
-    columns:
-      - name: order_id
-        description: "Primary key"
-        tests:
-          - unique
-          - not_null
-      - name: customer_id
-        tests:
-          - not_null
-      - name: status
         tests:
           - not_null

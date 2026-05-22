@@ -2,42 +2,42 @@ version: 2
 
 sources:
   - name: raw
-    description: "Raw source data loaded from Azure ADLS Gen2"
+    description: "Raw source data loaded into Snowflake"
     database: ecommerce_dev
     schema: raw
     tables:
       - name: raw_customers
-        description: "Raw customer data"
+        description: "Raw customer data from source system"
         columns:
           - name: customer_id
             tests:
               - not_null
       - name: raw_orders
-        description: "Raw orders"
+        description: "Raw orders from source system"
         columns:
           - name: order_id
             tests:
               - not_null
       - name: raw_products
-        description: "Raw products"
+        description: "Raw product catalog"
         columns:
           - name: product_id
             tests:
               - not_null
       - name: raw_order_items
-        description: "Raw order items"
+        description: "Raw order line items"
         columns:
           - name: order_item_id
             tests:
               - not_null
       - name: raw_payments
-        description: "Raw payments"
+        description: "Raw payment transactions"
         columns:
           - name: payment_id
             tests:
               - not_null
       - name: raw_events
-        description: "Raw events"
+        description: "Raw clickstream events"
         columns:
           - name: event_id
             tests:

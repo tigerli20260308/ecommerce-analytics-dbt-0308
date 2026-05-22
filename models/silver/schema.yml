@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: int_orders_enriched
+    description: "Orders joined with customers, payments and items"
+    columns:
+      - name: order_id
+        description: "Primary key"
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "Foreign key to stg_customers"
+        tests:
+          - not_null
+      - name: order_total
+        description: "Total order value after discounts"
+      - name: customer_name
+        description: "Customer full name from stg_customers"
+
+  - name: int_customer_orders
+    description: "Customer summary with order history and segments"
+    columns:
+      - name: customer_id
+        description: "Primary key"
+        tests:
+          - unique
+          - not_null
+      - name: customer_segment
+        description: "Derived segment based on order count"
+        tests:
+          - not_null
+          - accepted_values:
+              config:
+                severity: warn
+              arguments:
+                values: ['no_orders','new','returning','loyal']
+      - name: total_orders
+        description: "Total number of orders placed"
+        tests:
+          - not_null
+
+  - name: int_product_performance
+    description: "Product sales and engagement metrics"
+    columns:
+      - name: product_id
+        description: "Primary key"
+        tests:
+          - unique
+          - not_null
+      - name: total_revenue
+        description: "Total net revenue from this product"
+        tests:
+          - not_null
+      - name: cart_rate_pct
+        description: "Percentage of views that led to add-to-cart"

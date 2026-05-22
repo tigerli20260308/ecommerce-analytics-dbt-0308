@@ -1,5 +1,20 @@
+{{
+    config(
+        materialized = 'incremental',
+        unique_key   = 'order_id',
+        on_schema_change = 'sync_all_columns'
+    )
+}}
+
 WITH source AS (
     SELECT * FROM {{ source('raw', 'raw_orders') }}
+
+    {% if is_incremental() %}
+        WHERE created_at::TIMESTAMP > (
+            SELECT MAX(created_at)
+            FROM {{ this }}
+        )
+    {% endif %}
 ),
 
 renamed AS (
@@ -14,8 +29,6 @@ renamed AS (
         NULLIF(discount_code, '')::VARCHAR      AS discount_code,
         created_at::TIMESTAMP                   AS created_at,
         updated_at::TIMESTAMP                   AS updated_at,
-
-        -- derived columns
         DATEDIFF('day',
             order_date::DATE,
             CURRENT_DATE)                       AS order_age_days,

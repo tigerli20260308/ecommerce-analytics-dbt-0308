@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: metricflow_time_spine
-    description: "Time spine model required by MetricFlow"
-    columns:
-      - name: date_day
-        description: "One row per calendar day"
+    description: "Time spine for MetricFlow semantic layer"
+    config:
+      meta:
+        time_spine: true

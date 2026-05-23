@@ -109,7 +109,7 @@ jobs:
                 role: dbt_dev_role
                 database: ecommerce_prod
                 warehouse: dbt_dev_wh
-                schema: prod
+                schema: ''
                 threads: 8
             target: prod
           EOF

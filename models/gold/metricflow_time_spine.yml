@@ -3,4 +3,6 @@ version: 2
 models:
   - name: metricflow_time_spine
     description: "Time spine model required by MetricFlow"
-    --test--ci--
+    columns:
+      - name: date_day
+        description: "One row per calendar day"

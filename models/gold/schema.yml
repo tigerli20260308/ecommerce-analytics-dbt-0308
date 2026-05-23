@@ -1,0 +1,97 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: "Customer dimension table with order history and segments"
+    columns:
+      - name: customer_id
+        description: "Primary key"
+        tests:
+          - unique
+          - not_null
+      - name: email
+        description: "Customer email — unique identifier"
+        tests:
+          - unique
+          - not_null
+      - name: customer_segment
+        description: "Segment based on order count"
+        tests:
+          - not_null
+          - accepted_values:
+              config:
+                severity: warn
+              arguments:
+                values: ['no_orders','new','returning','loyal']
+      - name: is_active_customer
+        description: "Has placed at least one order"
+        tests:
+          - not_null
+
+  - name: dim_products
+    description: "Product dimension with sales and engagement metrics"
+    columns:
+      - name: product_id
+        description: "Primary key"
+        tests:
+          - unique
+          - not_null
+      - name: revenue_tier
+        description: "Revenue classification"
+        tests:
+          - not_null
+          - accepted_values:
+              config:
+                severity: warn
+              arguments:
+                values: ['high','medium','low']
+      - name: sales_velocity
+        description: "Sales speed classification"
+        tests:
+          - not_null
+
+  - name: fct_orders
+    description: "Order fact table — one row per order"
+    columns:
+      - name: order_id
+        description: "Primary key"
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "Foreign key to dim_customers"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id
+      - name: order_total
+        description: "Total order value"
+        tests:
+          - not_null
+      - name: is_overdue
+        description: "Whether order exceeded SLA days"
+        tests:
+          - not_null
+
+  - name: fct_payments
+    description: "Payment fact table — one row per payment"
+    columns:
+      - name: payment_id
+        description: "Primary key"
+        tests:
+          - unique
+          - not_null
+      - name: order_id
+        description: "Foreign key to fct_orders"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fct_orders')
+                field: order_id
+      - name: net_payment_amount
+        description: "Payment amount after processing fees"
+        tests:
+          - not_null

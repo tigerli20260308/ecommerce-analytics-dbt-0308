@@ -1,6 +1,9 @@
+-- CORRECT ✅
 WITH source AS (
     SELECT * FROM {{ source('raw', 'raw_events') }}
-    WHERE created_at >= '{{ var("start_date") }}' 
+    -- no filter in bronze
+    -- load ALL events
+    -- filter in silver/gold if needed
 ),
 
 renamed AS (
@@ -12,8 +15,6 @@ renamed AS (
         page_url::VARCHAR                       AS page_url,
         NULLIF(product_id, '')::INTEGER         AS product_id,
         created_at::TIMESTAMP                   AS created_at,
-
-        -- derived columns
         created_at::DATE                        AS event_date,
         DATE_TRUNC('hour',
             created_at::TIMESTAMP)              AS event_hour

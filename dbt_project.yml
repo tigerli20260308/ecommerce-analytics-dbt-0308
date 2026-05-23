@@ -2,12 +2,8 @@ name: 'ecommerce_analytics'
 version: '1.0.0'
 config-version: 2
 
-profile: 'ecommerce_analytics'
 
-vars:
-  start_date: '2023-01-01'
-  lookback_days: 30
-  env_name: 'dev'
+profile: 'ecommerce_analytics'
 
 model-paths: ["models"]
 seed-paths: ["seeds"]
@@ -20,6 +16,11 @@ target-path: "target"
 clean-targets:
   - "target"
   - "dbt_packages"
+
+vars:
+  start_date: '2023-01-01'
+  lookback_days: 30
+  env_name: 'dev'
 
 models:
   ecommerce_analytics:
@@ -41,4 +42,3 @@ seeds:
 snapshots:
   ecommerce_analytics:
     +target_schema: snapshots
-

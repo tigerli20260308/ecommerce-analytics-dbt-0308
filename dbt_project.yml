@@ -4,6 +4,12 @@ config-version: 2
 
 profile: 'ecommerce_analytics'
 
+# ADD THIS SECTION
+vars:
+  start_date: '2023-01-01'
+  lookback_days: 30
+  env_name: 'dev'
+
 model-paths: ["models"]
 seed-paths: ["seeds"]
 test-paths: ["tests"]
@@ -36,3 +42,4 @@ seeds:
 snapshots:
   ecommerce_analytics:
     +target_schema: snapshots
+

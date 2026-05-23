@@ -5,15 +5,15 @@ models:
     description: "Staged customers — cleaned and typed from raw"
     columns:
       - name: customer_id
-        description: "Primary key"
         tests:
           - unique
           - not_null
+          - dbt_utils.not_constant  # column shouldn't be all same value
       - name: email
-        description: "Customer email — lowercased"
         tests:
           - unique
           - not_null
+          - dbt_utils.not_empty_string  # no empty strings
       - name: country_code
         description: "ISO 2-letter country code — uppercased"
         tests:

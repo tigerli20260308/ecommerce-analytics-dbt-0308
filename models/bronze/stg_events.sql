@@ -1,5 +1,6 @@
 WITH source AS (
     SELECT * FROM {{ source('raw', 'raw_events') }}
+    WHERE created_at >= '{{ var("start_date") }}' 
 ),
 
 renamed AS (

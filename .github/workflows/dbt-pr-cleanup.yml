@@ -1,0 +1,61 @@
+name: dbt PR Cleanup
+
+on:
+  pull_request:
+    types:
+      - closed          # triggers when PR merged OR abandoned
+
+env:
+  DBT_VERSION: 1.8.0
+
+jobs:
+  cleanup:
+    name: Drop CI Schema
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dbt-snowflake
+        run: pip install dbt-snowflake==${{ env.DBT_VERSION }}
+
+      - name: Create profiles.yml
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << EOF
+          ecommerce_analytics:
+            outputs:
+              ci:
+                type: snowflake
+                account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+                user: ${{ secrets.SNOWFLAKE_USER }}
+                password: ${{ secrets.SNOWFLAKE_PASSWORD }}
+                role: dbt_dev_role
+                database: ecommerce_dev
+                warehouse: dbt_dev_wh
+                schema: ci_pr${{ github.event.pull_request.number }}
+                threads: 4
+            target: ci
+          EOF
+
+      - name: dbt deps
+        run: dbt deps
+
+      - name: Drop CI schema
+        run: |
+          dbt run-operation drop_schema \
+            --args "{'schema_name': 'ci_pr${{ github.event.pull_request.number }}'}" \
+            --target ci
+        continue-on-error: true
+
+      - name: Confirm cleanup
+        run: |
+          echo "🧹 Cleaned up CI schema:"
+          echo "Schema: ecommerce_dev.ci_pr${{ github.event.pull_request.number }}"
+          echo "PR: #${{ github.event.pull_request.number }}"

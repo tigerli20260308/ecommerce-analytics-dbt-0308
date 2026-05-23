@@ -2,7 +2,7 @@ version: 2
 
 semantic_models:
   - name: orders
-    description: "Semantic model for order metrics"
+    description: "Semantic model for order analytics"
     model: ref('fct_orders')
 
     defaults:
@@ -32,18 +32,14 @@ semantic_models:
 
     measures:
       - name: order_count
-        description: "Total number of orders"
+        description: "Number of orders"
         agg: count
         expr: order_id
       - name: total_revenue
-        description: "Total order revenue"
+        description: "Total revenue"
         agg: sum
         expr: order_total
       - name: avg_order_value
         description: "Average order value"
         agg: average
         expr: order_total
-      - name: total_discount
-        description: "Total discounts given"
-        agg: sum
-        expr: total_discount

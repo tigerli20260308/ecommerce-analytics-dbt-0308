@@ -35,6 +35,9 @@ models:
     gold:
       +materialized: table
       +schema: gold
+      metricflow_time_spine:
+        +meta:
+          time_spine: true     
 
 seeds:
   ecommerce_analytics:

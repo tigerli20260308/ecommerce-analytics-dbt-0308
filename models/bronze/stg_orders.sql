@@ -1,5 +1,7 @@
 WITH source AS (
     SELECT * FROM {{ source('raw', 'raw_orders') }}
+    -- remove this line completely:
+    -- WHERE order_date >= '{{ var("start_date") }}'
 ),
 
 renamed AS (
@@ -14,16 +16,13 @@ renamed AS (
         NULLIF(discount_code, '')::VARCHAR      AS discount_code,
         created_at::TIMESTAMP                   AS created_at,
         updated_at::TIMESTAMP                   AS updated_at,
-
-        -- derived columns
         DATEDIFF('day',
             order_date::DATE,
             CURRENT_DATE)                       AS order_age_days,
         CASE
             WHEN discount_code IS NOT NULL
             AND  discount_code != ''
-            THEN TRUE
-            ELSE FALSE
+            THEN TRUE ELSE FALSE
         END                                     AS has_discount
     FROM source
 )

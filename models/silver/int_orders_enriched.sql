@@ -48,23 +48,18 @@ final AS (
         c.country_code                          AS customer_country,
 
         -- order financials
-        -- oi.order_total,
-        -- oi.order_gross_total,
-        -- oi.total_discount,
-        -- oi.item_count,
-        -- oi.total_quantity,
-        -- FIXED ✅
-        COALESCE(oi.order_total, 0)     AS order_total,
-        COALESCE(oi.item_count, 0)      AS item_count,
-        COALESCE(oi.total_quantity, 0)  AS total_quantity,
-        COALESCE(oi.total_discount, 0)  AS total_discount,
-        COALESCE(oi.order_gross_total, 0) AS order_gross_total,
+        COALESCE(oi.order_total, 0)             AS order_total,
+        COALESCE(oi.order_gross_total, 0)       AS order_gross_total,
+        COALESCE(oi.total_discount, 0)          AS total_discount,
+        COALESCE(oi.item_count, 0)              AS item_count,
+        COALESCE(oi.total_quantity, 0)          AS total_quantity,
 
-        -- payment info
-        p.total_paid,
-        p.payment_count,
-        p.has_successful_payment,
-        p.latest_payment_status
+        -- payment info ← COALESCE added
+        COALESCE(p.total_paid, 0)               AS total_paid,
+        COALESCE(p.payment_count, 0)            AS payment_count,
+        COALESCE(p.has_successful_payment, 0)   AS has_successful_payment,
+        p.latest_payment_status                 AS latest_payment_status
+
     FROM orders o
     LEFT JOIN customers c
         ON o.customer_id = c.customer_id

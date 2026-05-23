@@ -40,9 +40,9 @@ final AS (
         o.shipping_country_code,
 
         -- payment method context
-        pm.payment_category,
-        pm.is_digital,
-        pm.processing_fee_pct,
+        COALESCE(pm.payment_category, 'unknown')    AS payment_category,
+        COALESCE(pm.is_digital, FALSE)              AS is_digital,
+        COALESCE(pm.processing_fee_pct, 0)         AS processing_fee_pct,
         ROUND(
             p.amount * pm.processing_fee_pct
         , 2)                                    AS processing_fee_amount,

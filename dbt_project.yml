@@ -27,6 +27,8 @@ models:
     bronze:
       +materialized: view
       +schema: bronze
+      +pre-hook:
+        - "{{ detect_new_columns(this) }}"
     silver:
       +materialized: view
       +schema: silver

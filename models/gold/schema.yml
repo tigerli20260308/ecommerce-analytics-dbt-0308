@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: dim_customers
-    description: "Customer dimension table with order history and segments"
+    description: "{{ doc('dim_customers') }}"     
     columns:
       - name: customer_id
         description: "Primary key"
@@ -15,7 +15,7 @@ models:
           - unique
           - not_null
       - name: customer_segment
-        description: "Segment based on order count"
+        description: "{{ doc('customer_segment') }}"     
         tests:
           - not_null
           - accepted_values:
@@ -29,7 +29,7 @@ models:
           - not_null
 
   - name: dim_products
-    description: "Product dimension with sales and engagement metrics"
+    description: "{{ doc('dim_products') }}"     
     columns:
       - name: product_id
         description: "Primary key"
@@ -37,7 +37,7 @@ models:
           - unique
           - not_null
       - name: revenue_tier
-        description: "Revenue classification"
+        description: "Revenue classification high/medium/low"
         tests:
           - not_null
           - accepted_values:
@@ -51,19 +51,13 @@ models:
           - not_null
 
   - name: fct_orders
-    description: "Order fact table — one row per order"
+    description: "{{ doc('fct_orders') }}"     
     columns:
       - name: order_id
         description: "Primary key"
         tests:
-          - unique:
-              config:
-                severity: error
-                store_failures: true
-          - not_null:
-              config:
-                severity: error
-                store_failures: true
+          - unique
+          - not_null
       - name: customer_id
         description: "Foreign key to dim_customers"
         tests:
@@ -73,7 +67,7 @@ models:
                 to: ref('dim_customers')
                 field: customer_id
       - name: order_total
-        description: "Total order value"
+        description: "Total order value after discounts"
         tests:
           - not_null
       - name: is_overdue
@@ -82,7 +76,7 @@ models:
           - not_null
 
   - name: fct_payments
-    description: "Payment fact table — one row per payment"
+    description: "{{ doc('fct_payments') }}"     
     columns:
       - name: payment_id
         description: "Primary key"

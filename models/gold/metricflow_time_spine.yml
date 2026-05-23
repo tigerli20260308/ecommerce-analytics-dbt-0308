@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: metricflow_time_spine
+    description: "Time spine model required by MetricFlow"

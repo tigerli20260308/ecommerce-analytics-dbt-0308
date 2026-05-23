@@ -1,0 +1,37 @@
+version: 2
+
+metrics:
+  - name: total_revenue
+    description: "Total revenue from completed orders"
+    type: simple
+    type_params:
+      measure: total_revenue
+    filter: |
+      {{ Dimension('order__status') }} = 'completed'
+
+  - name: order_count
+    description: "Total number of orders"
+    type: simple
+    type_params:
+      measure: order_count
+
+  - name: avg_order_value
+    description: "Average value per order"
+    type: simple
+    type_params:
+      measure: avg_order_value
+
+  - name: discount_rate
+    description: "Percentage of orders with discounts"
+    type: ratio
+    type_params:
+      numerator: order_count
+      denominator: order_count
+    filter: |
+      {{ Dimension('order__has_discount') }} = 'true'
+
+  - name: revenue_by_country
+    description: "Revenue broken down by shipping country"
+    type: simple
+    type_params:
+      measure: total_revenue

@@ -1,0 +1,49 @@
+version: 2
+
+semantic_models:
+  - name: orders
+    description: "Semantic model for order metrics"
+    model: ref('fct_orders')
+
+    defaults:
+      agg_time_dimension: order_date
+
+    entities:
+      - name: order
+        type: primary
+        expr: order_id
+      - name: customer
+        type: foreign
+        expr: customer_id
+
+    dimensions:
+      - name: order_date
+        type: time
+        type_params:
+          time_granularity: day
+      - name: status
+        type: categorical
+      - name: shipping_country_code
+        type: categorical
+      - name: has_discount
+        type: categorical
+      - name: is_overdue
+        type: categorical
+
+    measures:
+      - name: order_count
+        description: "Total number of orders"
+        agg: count
+        expr: order_id
+      - name: total_revenue
+        description: "Total order revenue"
+        agg: sum
+        expr: order_total
+      - name: avg_order_value
+        description: "Average order value"
+        agg: average
+        expr: order_total
+      - name: total_discount
+        description: "Total discounts given"
+        agg: sum
+        expr: total_discount

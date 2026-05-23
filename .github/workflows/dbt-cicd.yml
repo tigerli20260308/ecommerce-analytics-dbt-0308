@@ -1,0 +1,159 @@
+name: dbt CI/CD Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+env:
+  DBT_VERSION: 1.8.0
+
+jobs:
+
+  # ─────────────────────────────────────────
+  # CI JOB: runs on Pull Request
+  # ─────────────────────────────────────────
+  dbt-ci:
+    name: CI — Test Changed Models
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dbt-snowflake
+        run: pip install dbt-snowflake==${{ env.DBT_VERSION }}
+
+      - name: Create profiles.yml
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << EOF
+          ecommerce_analytics:
+            outputs:
+              ci:
+                type: snowflake
+                account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+                user: ${{ secrets.SNOWFLAKE_USER }}
+                password: ${{ secrets.SNOWFLAKE_PASSWORD }}
+                role: dbt_dev_role
+                database: ecommerce_dev
+                warehouse: dbt_dev_wh
+                schema: ci_pr${{ github.event.pull_request.number }}
+                threads: 4
+            target: ci
+          EOF
+
+      - name: dbt deps
+        run: dbt deps
+
+      - name: Download prod artifacts for Slim CI
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          name: prod-artifacts
+          path: prod-artifacts
+        continue-on-error: true
+
+      - name: dbt build — Slim CI
+        run: |
+          if [ -f prod-artifacts/manifest.json ]; then
+            echo "Running Slim CI with state:modified+"
+            dbt build \
+              --select state:modified+ \
+              --defer \
+              --state prod-artifacts \
+              --target ci
+          else
+            echo "No prod artifacts found — running full build"
+            dbt build --target ci
+          fi
+
+      - name: Show test results
+        if: always()
+        run: |
+          echo "CI run complete for PR #${{ github.event.pull_request.number }}"
+
+  # ─────────────────────────────────────────
+  # CD JOB: runs on merge to main
+  # ─────────────────────────────────────────
+  dbt-cd:
+    name: CD — Deploy to Production
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dbt-snowflake
+        run: pip install dbt-snowflake==${{ env.DBT_VERSION }}
+
+      - name: Create profiles.yml for prod
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << EOF
+          ecommerce_analytics:
+            outputs:
+              prod:
+                type: snowflake
+                account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+                user: ${{ secrets.SNOWFLAKE_USER }}
+                password: ${{ secrets.SNOWFLAKE_PASSWORD }}
+                role: dbt_dev_role
+                database: ecommerce_prod
+                warehouse: dbt_dev_wh
+                schema: prod
+                threads: 8
+            target: prod
+          EOF
+
+      - name: dbt deps
+        run: dbt deps
+
+      - name: dbt seed
+        run: dbt seed --target prod
+
+      - name: dbt snapshot
+        run: dbt snapshot --target prod
+
+      - name: dbt build
+        run: dbt build --target prod
+
+      - name: dbt compile — generate artifacts
+        run: dbt compile --target prod
+
+      - name: Save prod manifest for Slim CI
+        uses: actions/upload-artifact@v3
+        with:
+          name: prod-artifacts
+          path: |
+            target/manifest.json
+          retention-days: 30
+
+      - name: Summary
+        if: success()
+        run: |
+          echo "✅ Production deployment successful!"
+          echo "Deployed to: ecommerce_prod"
+          echo "Branch: ${{ github.ref }}"
+          echo "Commit: ${{ github.sha }}"
+
+      - name: Failure alert
+        if: failure()
+        run: |
+          echo "❌ Production deployment FAILED!"
+          echo "Branch: ${{ github.ref }}"
+          echo "Commit: ${{ github.sha }}"

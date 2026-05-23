@@ -2,8 +2,8 @@ name: dbt Scheduled Production Run
 
 on:
   schedule:
-    - cron: '0 6 * * *'    # 6am UTC every day
-  workflow_dispatch:         # manual trigger button in GitHub UI
+    - cron: '0 6 * * *'
+  workflow_dispatch:
 
 env:
   DBT_VERSION: 1.8.0
@@ -15,10 +15,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4          ← v3 → v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5      ← v4 → v5
         with:
           python-version: '3.11'
 
@@ -60,7 +60,7 @@ jobs:
         run: dbt compile --target prod
 
       - name: Save prod artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4   ← v3 → v4
         with:
           name: prod-artifacts
           path: target/manifest.json
@@ -68,14 +68,8 @@ jobs:
 
       - name: Success summary
         if: success()
-        run: |
-          echo "✅ Scheduled run complete!"
-          echo "Time: $(date)"
-          echo "Database: ecommerce_prod"
+        run: echo "✅ Scheduled run complete! $(date)"
 
       - name: Failure summary
         if: failure()
-        run: |
-          echo "❌ Scheduled run FAILED!"
-          echo "Time: $(date)"
-          echo "Check GitHub Actions logs"
+        run: echo "❌ Scheduled run FAILED! $(date)"

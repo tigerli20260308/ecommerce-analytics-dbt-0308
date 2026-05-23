@@ -23,10 +23,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4          ← v3 → v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5      ← v4 → v5
         with:
           python-version: '3.11'
 
@@ -56,7 +56,7 @@ jobs:
         run: dbt deps
 
       - name: Download prod artifacts for Slim CI
-        uses: dawidd6/action-download-artifact@v2
+        uses: dawidd6/action-download-artifact@v3  ← v2 → v3
         with:
           name: prod-artifacts
           path: prod-artifacts
@@ -79,7 +79,8 @@ jobs:
       - name: Show test results
         if: always()
         run: |
-          echo "CI run complete for PR #${{ github.event.pull_request.number }}"
+          echo "CI complete for PR #${{ github.event.pull_request.number }}"
+
 
   # ─────────────────────────────────────────
   # CD JOB: runs on merge to main
@@ -91,10 +92,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4          ← v3 → v4
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5      ← v4 → v5
         with:
           python-version: '3.11'
 
@@ -132,11 +133,11 @@ jobs:
       - name: dbt build
         run: dbt build --target prod
 
-      - name: dbt compile — generate artifacts
+      - name: dbt compile
         run: dbt compile --target prod
 
       - name: Save prod manifest for Slim CI
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4   ← v3 → v4
         with:
           name: prod-artifacts
           path: |
@@ -148,12 +149,10 @@ jobs:
         run: |
           echo "✅ Production deployment successful!"
           echo "Deployed to: ecommerce_prod"
-          echo "Branch: ${{ github.ref }}"
           echo "Commit: ${{ github.sha }}"
 
       - name: Failure alert
         if: failure()
         run: |
           echo "❌ Production deployment FAILED!"
-          echo "Branch: ${{ github.ref }}"
           echo "Commit: ${{ github.sha }}"

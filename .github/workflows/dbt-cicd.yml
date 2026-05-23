@@ -13,9 +13,6 @@ env:
 
 jobs:
 
-  # ─────────────────────────────────────────
-  # CI JOB: runs on Pull Request
-  # ─────────────────────────────────────────
   dbt-ci:
     name: CI — Test Changed Models
     runs-on: ubuntu-latest
@@ -23,10 +20,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4          ← v3 → v4
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v5      ← v4 → v5
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -56,13 +53,13 @@ jobs:
         run: dbt deps
 
       - name: Download prod artifacts for Slim CI
-        uses: dawidd6/action-download-artifact@v3  ← v2 → v3
+        uses: dawidd6/action-download-artifact@v3
         with:
           name: prod-artifacts
           path: prod-artifacts
         continue-on-error: true
 
-      - name: dbt build — Slim CI
+      - name: dbt build Slim CI
         run: |
           if [ -f prod-artifacts/manifest.json ]; then
             echo "Running Slim CI with state:modified+"
@@ -78,13 +75,9 @@ jobs:
 
       - name: Show test results
         if: always()
-        run: |
-          echo "CI complete for PR #${{ github.event.pull_request.number }}"
+        run: echo "CI complete for PR ${{ github.event.pull_request.number }}"
 
 
-  # ─────────────────────────────────────────
-  # CD JOB: runs on merge to main
-  # ─────────────────────────────────────────
   dbt-cd:
     name: CD — Deploy to Production
     runs-on: ubuntu-latest
@@ -92,10 +85,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4          ← v3 → v4
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v5      ← v4 → v5
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -136,23 +129,17 @@ jobs:
       - name: dbt compile
         run: dbt compile --target prod
 
-      - name: Save prod manifest for Slim CI
-        uses: actions/upload-artifact@v4   ← v3 → v4
+      - name: Save prod manifest
+        uses: actions/upload-artifact@v4
         with:
           name: prod-artifacts
-          path: |
-            target/manifest.json
+          path: target/manifest.json
           retention-days: 30
 
       - name: Summary
         if: success()
-        run: |
-          echo "✅ Production deployment successful!"
-          echo "Deployed to: ecommerce_prod"
-          echo "Commit: ${{ github.sha }}"
+        run: echo "Production deployment successful! Commit ${{ github.sha }}"
 
       - name: Failure alert
         if: failure()
-        run: |
-          echo "❌ Production deployment FAILED!"
-          echo "Commit: ${{ github.sha }}"
+        run: echo "Production deployment FAILED! Commit ${{ github.sha }}"

@@ -15,10 +15,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4          ← v3 → v4
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v5      ← v4 → v5
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -60,7 +60,7 @@ jobs:
         run: dbt compile --target prod
 
       - name: Save prod artifacts
-        uses: actions/upload-artifact@v4   ← v3 → v4
+        uses: actions/upload-artifact@v4
         with:
           name: prod-artifacts
           path: target/manifest.json
@@ -68,8 +68,8 @@ jobs:
 
       - name: Success summary
         if: success()
-        run: echo "✅ Scheduled run complete! $(date)"
+        run: echo "Scheduled run complete! $(date)"
 
       - name: Failure summary
         if: failure()
-        run: echo "❌ Scheduled run FAILED! $(date)"
+        run: echo "Scheduled run FAILED! $(date)"

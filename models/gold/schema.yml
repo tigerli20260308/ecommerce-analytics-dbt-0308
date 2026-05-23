@@ -56,8 +56,14 @@ models:
       - name: order_id
         description: "Primary key"
         tests:
-          - unique
-          - not_null
+          - unique:
+              config:
+                severity: error
+                store_failures: true
+          - not_null:
+              config:
+                severity: error
+                store_failures: true
       - name: customer_id
         description: "Foreign key to dim_customers"
         tests:

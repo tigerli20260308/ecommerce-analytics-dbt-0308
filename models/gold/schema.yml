@@ -5,25 +5,59 @@ models:
     description: "{{ doc('dim_customers') }}"
     config:
       contract:
-        enforced: true              
+        enforced: true
     columns:
       - name: customer_id
         description: "Primary key"
-        data_type: integer          
-        constraints:
-          - type: not_null          
+        data_type: number(38,0)
         tests:
           - unique
           - not_null
+      - name: full_name
+        description: "Customer full name"
+        data_type: text
       - name: email
         description: "Customer email — unique identifier"
-        data_type: varchar          
+        data_type: text
         tests:
           - unique
           - not_null
+      - name: country_code
+        description: "ISO 2-letter country code"
+        data_type: text
+      - name: city
+        description: "Customer city"
+        data_type: text
+      - name: customer_age_days
+        description: "Days since customer created"
+        data_type: number(38,0)
+      - name: created_at
+        description: "Customer creation timestamp"
+        data_type: timestamp_ntz
+      - name: total_orders
+        description: "Total orders placed"
+        data_type: number(38,0)
+      - name: completed_orders
+        description: "Completed orders count"
+        data_type: number(38,0)
+      - name: cancelled_orders
+        description: "Cancelled orders count"
+        data_type: number(38,0)
+      - name: first_order_date
+        description: "Date of first order"
+        data_type: date
+      - name: last_order_date
+        description: "Date of last order"
+        data_type: date
+      - name: days_as_customer
+        description: "Days between first and last order"
+        data_type: number(38,0)
+      - name: discount_order_count
+        description: "Orders with discounts"
+        data_type: number(38,0)
       - name: customer_segment
         description: "{{ doc('customer_segment') }}"
-        data_type: varchar          
+        data_type: text
         tests:
           - not_null
           - accepted_values:
@@ -33,42 +67,76 @@ models:
                 values: ['no_orders','new','returning','loyal']
       - name: is_active_customer
         description: "Has placed at least one order"
-        data_type: boolean          
+        data_type: boolean
         tests:
           - not_null
+      - name: is_recent_customer
+        description: "Ordered in last 90 days"
+        data_type: boolean
 
   - name: dim_products
     description: "{{ doc('dim_products') }}"
     config:
       contract:
-        enforced: true             
+        enforced: true
     columns:
       - name: product_id
         description: "Primary key"
-        data_type: integer          
-        constraints:
-          - type: not_null
+        data_type: number(38,0)
         tests:
           - unique
           - not_null
       - name: product_name
         description: "Product name"
-        data_type: varchar
+        data_type: text
       - name: category
         description: "Product category"
-        data_type: varchar
+        data_type: text
+      - name: subcategory
+        description: "Product subcategory"
+        data_type: text
       - name: unit_price
         description: "Selling price"
         data_type: float
+      - name: cost_price
+        description: "Cost price"
+        data_type: float
+      - name: gross_margin
+        description: "Gross margin amount"
+        data_type: float
       - name: gross_margin_pct
-        description: "Margin percentage"
+        description: "Gross margin percentage"
         data_type: float
       - name: is_active
         description: "Whether product is active"
         data_type: boolean
+      - name: orders_count
+        description: "Number of orders"
+        data_type: number(38,0)
+      - name: total_units_sold
+        description: "Total units sold"
+        data_type: number(38,0)
+      - name: total_revenue
+        description: "Total revenue"
+        data_type: float
+      - name: total_discounts
+        description: "Total discounts"
+        data_type: float
+      - name: avg_selling_price
+        description: "Average selling price"
+        data_type: float
+      - name: view_count
+        description: "Page view count"
+        data_type: number(38,0)
+      - name: add_to_cart_count
+        description: "Add to cart count"
+        data_type: number(38,0)
+      - name: cart_rate_pct
+        description: "Cart conversion rate"
+        data_type: number(38,0)
       - name: revenue_tier
         description: "Revenue classification high/medium/low"
-        data_type: varchar          
+        data_type: text
         tests:
           - not_null
           - accepted_values:
@@ -78,7 +146,7 @@ models:
                 values: ['high','medium','low']
       - name: sales_velocity
         description: "Sales speed classification"
-        data_type: varchar         
+        data_type: text
         tests:
           - not_null
 
@@ -86,19 +154,17 @@ models:
     description: "{{ doc('fct_orders') }}"
     config:
       contract:
-        enforced: true              
+        enforced: true
     columns:
       - name: order_id
         description: "Primary key"
-        data_type: integer          
-        constraints:
-          - type: not_null
+        data_type: number(38,0)
         tests:
           - unique
           - not_null
       - name: customer_id
         description: "Foreign key to dim_customers"
-        data_type: integer          
+        data_type: number(38,0)
         tests:
           - not_null
           - relationships:
@@ -107,24 +173,75 @@ models:
                 field: customer_id
       - name: order_date
         description: "Date order was placed"
-        data_type: date             
+        data_type: date
       - name: status
         description: "Order status"
-        data_type: varchar
+        data_type: text
+      - name: shipping_city
+        description: "Shipping city"
+        data_type: text
+      - name: shipping_country_code
+        description: "Shipping country code"
+        data_type: text
+      - name: discount_code
+        description: "Discount code used"
+        data_type: text
+      - name: has_discount
+        description: "Whether order had discount"
+        data_type: boolean
+      - name: order_age_days
+        description: "Days since order placed"
+        data_type: number(38,0)
+      - name: customer_name
+        description: "Customer full name"
+        data_type: text
+      - name: customer_email
+        description: "Customer email"
+        data_type: text
+      - name: customer_country
+        description: "Customer country code"
+        data_type: text
       - name: order_total
         description: "Total order value after discounts"
-        data_type: float            ← add data_type
+        data_type: float
         tests:
           - not_null
+      - name: order_gross_total
+        description: "Gross order total"
+        data_type: float
+      - name: total_discount
+        description: "Total discount amount"
+        data_type: float
       - name: item_count
-        description: "Number of items in order"
-        data_type: integer
+        description: "Number of items"
+        data_type: number(38,0)
+      - name: total_quantity
+        description: "Total quantity"
+        data_type: number(38,0)
       - name: total_paid
         description: "Total amount paid"
         data_type: float
+      - name: payment_count
+        description: "Number of payments"
+        data_type: number(38,0)
+      - name: has_successful_payment
+        description: "Has successful payment"
+        data_type: number(38,0)
+      - name: latest_payment_status
+        description: "Latest payment status"
+        data_type: text
+      - name: status_label
+        description: "Human readable status label"
+        data_type: text
+      - name: is_terminal
+        description: "Whether status is terminal"
+        data_type: boolean
+      - name: sla_days
+        description: "SLA days for this status"
+        data_type: number(38,0)
       - name: is_overdue
-        description: "Whether order exceeded SLA days"
-        data_type: boolean          
+        description: "Whether order exceeded SLA"
+        data_type: boolean
         tests:
           - not_null
 
@@ -132,19 +249,17 @@ models:
     description: "{{ doc('fct_payments') }}"
     config:
       contract:
-        enforced: true              
+        enforced: true
     columns:
       - name: payment_id
         description: "Primary key"
-        data_type: integer          
-        constraints:
-          - type: not_null
+        data_type: number(38,0)
         tests:
           - unique
           - not_null
       - name: order_id
         description: "Foreign key to fct_orders"
-        data_type: integer          
+        data_type: number(38,0)
         tests:
           - not_null
           - relationships:
@@ -153,21 +268,48 @@ models:
                 field: order_id
       - name: payment_method
         description: "Payment method"
-        data_type: varchar
+        data_type: text
       - name: amount
         description: "Payment amount"
         data_type: float
       - name: currency
         description: "Payment currency"
-        data_type: varchar
+        data_type: text
       - name: payment_status
         description: "Payment status"
-        data_type: varchar
+        data_type: text
+      - name: transaction_id
+        description: "Transaction ID"
+        data_type: text
+      - name: created_at
+        description: "Payment timestamp"
+        data_type: timestamp_ntz
       - name: is_successful
         description: "Whether payment succeeded"
         data_type: boolean
+      - name: customer_id
+        description: "Customer ID from order"
+        data_type: number(38,0)
+      - name: order_date
+        description: "Order date"
+        data_type: date
+      - name: shipping_country_code
+        description: "Shipping country"
+        data_type: text
+      - name: payment_category
+        description: "Payment category"
+        data_type: text
+      - name: is_digital
+        description: "Whether digital payment"
+        data_type: boolean
+      - name: processing_fee_pct
+        description: "Processing fee percentage"
+        data_type: float
+      - name: processing_fee_amount
+        description: "Processing fee amount"
+        data_type: float
       - name: net_payment_amount
-        description: "Payment amount after processing fees"
-        data_type: float            
+        description: "Net payment after fees"
+        data_type: float
         tests:
           - not_null

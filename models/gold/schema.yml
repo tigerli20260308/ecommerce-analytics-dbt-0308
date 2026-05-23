@@ -2,20 +2,28 @@ version: 2
 
 models:
   - name: dim_customers
-    description: "{{ doc('dim_customers') }}"     
+    description: "{{ doc('dim_customers') }}"
+    config:
+      contract:
+        enforced: true              
     columns:
       - name: customer_id
         description: "Primary key"
+        data_type: integer          
+        constraints:
+          - type: not_null          
         tests:
           - unique
           - not_null
       - name: email
         description: "Customer email — unique identifier"
+        data_type: varchar          
         tests:
           - unique
           - not_null
       - name: customer_segment
-        description: "{{ doc('customer_segment') }}"     
+        description: "{{ doc('customer_segment') }}"
+        data_type: varchar          
         tests:
           - not_null
           - accepted_values:
@@ -25,19 +33,42 @@ models:
                 values: ['no_orders','new','returning','loyal']
       - name: is_active_customer
         description: "Has placed at least one order"
+        data_type: boolean          
         tests:
           - not_null
 
   - name: dim_products
-    description: "{{ doc('dim_products') }}"     
+    description: "{{ doc('dim_products') }}"
+    config:
+      contract:
+        enforced: true             
     columns:
       - name: product_id
         description: "Primary key"
+        data_type: integer          
+        constraints:
+          - type: not_null
         tests:
           - unique
           - not_null
+      - name: product_name
+        description: "Product name"
+        data_type: varchar
+      - name: category
+        description: "Product category"
+        data_type: varchar
+      - name: unit_price
+        description: "Selling price"
+        data_type: float
+      - name: gross_margin_pct
+        description: "Margin percentage"
+        data_type: float
+      - name: is_active
+        description: "Whether product is active"
+        data_type: boolean
       - name: revenue_tier
         description: "Revenue classification high/medium/low"
+        data_type: varchar          
         tests:
           - not_null
           - accepted_values:
@@ -47,51 +78,96 @@ models:
                 values: ['high','medium','low']
       - name: sales_velocity
         description: "Sales speed classification"
+        data_type: varchar         
         tests:
           - not_null
 
   - name: fct_orders
-    description: "{{ doc('fct_orders') }}"     
+    description: "{{ doc('fct_orders') }}"
+    config:
+      contract:
+        enforced: true              
     columns:
       - name: order_id
         description: "Primary key"
+        data_type: integer          
+        constraints:
+          - type: not_null
         tests:
           - unique
           - not_null
       - name: customer_id
         description: "Foreign key to dim_customers"
+        data_type: integer          
         tests:
           - not_null
           - relationships:
               arguments:
                 to: ref('dim_customers')
                 field: customer_id
+      - name: order_date
+        description: "Date order was placed"
+        data_type: date             
+      - name: status
+        description: "Order status"
+        data_type: varchar
       - name: order_total
         description: "Total order value after discounts"
+        data_type: float            ← add data_type
         tests:
           - not_null
+      - name: item_count
+        description: "Number of items in order"
+        data_type: integer
+      - name: total_paid
+        description: "Total amount paid"
+        data_type: float
       - name: is_overdue
         description: "Whether order exceeded SLA days"
+        data_type: boolean          
         tests:
           - not_null
 
   - name: fct_payments
-    description: "{{ doc('fct_payments') }}"     
+    description: "{{ doc('fct_payments') }}"
+    config:
+      contract:
+        enforced: true              
     columns:
       - name: payment_id
         description: "Primary key"
+        data_type: integer          
+        constraints:
+          - type: not_null
         tests:
           - unique
           - not_null
       - name: order_id
         description: "Foreign key to fct_orders"
+        data_type: integer          
         tests:
           - not_null
           - relationships:
               arguments:
                 to: ref('fct_orders')
                 field: order_id
+      - name: payment_method
+        description: "Payment method"
+        data_type: varchar
+      - name: amount
+        description: "Payment amount"
+        data_type: float
+      - name: currency
+        description: "Payment currency"
+        data_type: varchar
+      - name: payment_status
+        description: "Payment status"
+        data_type: varchar
+      - name: is_successful
+        description: "Whether payment succeeded"
+        data_type: boolean
       - name: net_payment_amount
         description: "Payment amount after processing fees"
+        data_type: float            
         tests:
           - not_null

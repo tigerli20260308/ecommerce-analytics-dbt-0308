@@ -1,7 +1,5 @@
 WITH source AS (
     SELECT * FROM {{ source('raw', 'raw_orders') }}
-    -- remove this line completely:
-    -- WHERE order_date >= '{{ var("start_date") }}'
 ),
 
 renamed AS (

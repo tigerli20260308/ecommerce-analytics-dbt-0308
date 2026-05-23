@@ -4,7 +4,6 @@ config-version: 2
 
 profile: 'ecommerce_analytics'
 
-# ADD THIS SECTION
 vars:
   start_date: '2023-01-01'
   lookback_days: 30

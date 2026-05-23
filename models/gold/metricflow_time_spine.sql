@@ -1,20 +1,20 @@
 {{
     config(
         materialized = 'table',
-        meta = {
-            'time_spine': true
-        }
+        schema = 'gold'
     )
 }}
 
-SELECT
-    date_day AS date_day
-FROM (
-    {{
-        dbt_utils.date_spine(
-            datepart   = "day",
-            start_date = "cast('2023-01-01' as date)",
-            end_date   = "cast('2026-12-31' as date)"
-        )
-    }}
+WITH spine AS (
+    SELECT
+        DATEADD(
+            DAY,
+            SEQ4(),
+            '2023-01-01'::DATE
+        ) AS date_day
+    FROM TABLE(GENERATOR(ROWCOUNT => 1461))
 )
+
+SELECT date_day
+FROM spine
+WHERE date_day <= '2026-12-31'::DATE
